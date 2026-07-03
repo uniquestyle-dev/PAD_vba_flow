@@ -1,0 +1,70 @@
+SET pass TO $'''dcnsknjzfkfiswyc'''
+Email.RetrieveEmails.Retrieve IMAPServer: $'''imap.gmail.com''' Port: 993 EnableSSL: True Username: $'''yonemori@localab.biz''' Password: pass AcceptUntrustedCertificates: False MailFolder: $'''STORES通知''' MailsToRetrieve: Email.RetrieveMessagesMode.Unread MarkAsRead: False RetrievedEmails=> RetrievedEmails
+/# ########　現在のファイル数を調べる　########
+########　現在のファイル数を調べる　########
+########　現在のファイル数を調べる　#########/
+Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.csv''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+SET myFileCount1 TO Files.Count
+SET myFileCount2 TO myFileCount1
+/# ########　日付取得　########
+########　日付取得　########
+########　日付取得　#########/
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+DateTime.Add DateTime: CurrentDateTime TimeToAdd: -1 TimeUnit: DateTime.TimeUnit.Days ResultedDate=> YesterdayDateTime
+Text.ConvertDateTimeToText.FromCustomDateTime DateTime: YesterdayDateTime CustomFormat: $'''yyyy-MM-dd''' Result=> YesterdayString
+Text.GetSubtext.GetSubtext Text: YesterdayString CharacterPosition: 0 NumberOfChars: 4 Subtext=> YesterdayYear
+Text.GetSubtext.GetSubtext Text: YesterdayString CharacterPosition: 5 NumberOfChars: 2 Subtext=> YesterdayMonth
+Text.GetSubtext.GetSubtext Text: YesterdayString CharacterPosition: 8 NumberOfChars: 2 Subtext=> YesterdayDay
+/# ########　STORES受注リストダウンロード　########
+########　STORES受注リストダウンロード　########
+########　STORES受注リストダウンロード　#########/
+Scripting.RunDOSCommand.RunDOSCommandAndFailOnTimeout DOSCommandOrApplication: $'''\"C:\\Users\\lenovo\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe\" -u stores_orders_export.py''' WorkingDirectory: $'''C:\\Users\\lenovo\\マイドライブ\\BackupAndRecovery\\PAD_file_API''' Timeout: 120 StandardOutput=> CommandOutput StandardError=> CommandErrorOutput ExitCode=> CommandExitCode
+IF CommandExitCode = 2 THEN
+    Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【2-7】STORES昨日受注リスト 0件''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【2-7】STORES昨日受注リスト 0件''' Body: $'''【2-7】STORES昨日受注リスト 0件''' IsBodyHtml: False
+ELSE IF CommandExitCode = 0 THEN
+    Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【2-7】STORES昨日受注リストDL完了''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【2-7】STORES昨日受注リストDL完了''' Body: $'''【2-7】STORES昨日受注リストDL完了''' IsBodyHtml: False
+ELSE
+    Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【2-7】※エラー　STORES受注リストDL''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【2-7】※エラー　STORES受注リストDL''' Body: CommandErrorOutput IsBodyHtml: False
+    EXIT Code: 0 ErrorMessage: CommandErrorOutput
+END
+LOOP WHILE (myFileCount1) = (myFileCount2)
+    Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.csv''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files2
+    SET myFileCount2 TO Files2.Count
+END
+File.ReadFromCSVFile.ReadCSV CSVFile: Files2[0].Fullname Encoding: File.CSVEncoding.UTF8 TrimFields: True FirstLineContainsColumnNames: True ColumnsSeparator: File.CSVColumnsSeparator.SystemDefault CSVTable=> CSVTable
+LOOP FOREACH CurrentMail IN RetrievedEmails
+    Text.Replace.ReplaceTextWithRegex Text: CurrentMail.Subject TextToFind: $'''^.*オーダー番号[:：]\\s*(\\d+).*$''' IgnoreCase: False ReplaceWith: $'''$1''' ActivateEscapeSequences: False Result=> OrderNumber
+    LOOP FOREACH CurrentRow IN CSVTable
+        IF CurrentRow['オーダー番号'] = $'''#%OrderNumber%''' THEN
+            Variables.CreateNewList List=> OrderArray
+            Variables.AddItemToList Item: CurrentRow['オーダー番号'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['決済方法'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['オーダー日時'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['顧客名'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['メールアドレス'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['アイテム名'] List: OrderArray
+            Variables.AddItemToList Item: CurrentRow['電話番号(購入者)'] List: OrderArray
+        END
+    END
+    Email.SendEmail.AuthenticateAndSend SMTPServer: $'''smtp.gmail.com''' Port: 465 EnableSSL: True Username: $'''yonemori@localab.biz''' Password: pass AcceptUntrustedCertificates: False SendFrom: $'''yonemori@localab.biz''' SenderDisplayName: $'''ロカボ実験室-STORES購入''' SendTo: $''' stores@localab.net''' Subject: $'''【STORES】購入-%OrderArray[3]%''' Body: $'''━━━━━━━━━━━━━━━━━━
+オーダー番号：%OrderArray[0]%
+注文日：%OrderArray[2]%
+お名前：%OrderArray[3]%
+電話番号：%OrderArray[6]%
+メールアドレス：%OrderArray[4]%
+お支払い方法：%OrderArray[1]%
+
+送信アカウント：stores@localab.net
+━━━━━━━━━━━━━━━━━━
+
+
+
+%CurrentMail.BodyText%''' IsBodyHtml: False
+    Variables.IncreaseVariable Value: Count IncrementValue: 1
+END
+Email.RetrieveEmails.Retrieve IMAPServer: $'''imap.gmail.com''' Port: 993 EnableSSL: True Username: $'''yonemori@localab.biz''' Password: pass AcceptUntrustedCertificates: False MailFolder: $'''STORES通知''' MailsToRetrieve: Email.RetrieveMessagesMode.Unread MarkAsRead: True RetrievedEmails=> RetrievedEmails
+Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAAC4KCdC9+9jXUqHbO0C/xVpyPUasOyQ+/uNiTNuP/UAYgAAAAAOgAAAAAIAACAAAAC9YoRkj/QeWdWB61fHkLkuBdBFNea3DdKXXoPp8GqpDiAAAAC5hwo/B8pGDbqIZGPTTw1xbvhK/R6ciQBIBznDpJrfA0AAAADRJcK5xeXvdbsHla/QkKgNxRR84PHBJQA3V5eFo2PiSQcCsSiS9gYFxagAmtdeAf3l13ME55+Q5GRw+/JQMgRn' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【2-8】STORES購入送信-完了''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【2-8】STORES購入送信 %Count% 件完了''' Body: $'''%Count% 件完了''' IsBodyHtml: False
+Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''order_*.csv''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files3
+File.Delete Files: Files3[0]
+@@flowname: '08.LPのPVとUU/購入クリックの転記'
+External.RunFlow FlowId: '7c932bc1-d6f9-4b7d-8e49-eaf3d3c68963' WaitToComplete: True

@@ -1,0 +1,9 @@
+# Excel個人用マクロブック本体（別途バックアップ済み）
+*.xlsb
+
+# Excelの一時ファイル
+~$*
+
+# WindowsやGoogle Driveが生成する管理ファイル
+Thumbs.db
+desktop.ini
