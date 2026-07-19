@@ -30,6 +30,7 @@ Sub TransferTrackingNumberStores(ByVal orderPath As String, ByVal daibikiPath As
     
     Const COL_SHIPPED As Long = 10
     wsOrder.Cells(1, COL_SHIPPED).Value = ChrW(&H767A) & ChrW(&H9001) & ChrW(&H5B8C) & ChrW(&H4E86)
+    wsOrder.Cells(1, COL_SHIPPED).NumberFormat = "@"
 
     For i = 2 To lastRowDaibiki
         targetName = Replace(Replace(Trim(CStr(wsDaibiki.Cells(i, 1).Value)), " ", ""), ChrW(&H3000), "")
@@ -54,9 +55,33 @@ Sub TransferTrackingNumberStores(ByVal orderPath As String, ByVal daibikiPath As
         End If
     Next j
     
-    wbOrder.SaveAs fileName:=orderPath, FileFormat:=xlCSV, Local:=True
+    Dim lastCol As Long, r As Long, c As Long
+    Dim rowLine As String, cellVal As String
+    Dim csvLines() As String
+    lastCol = wsOrder.Cells(1, wsOrder.Columns.Count).End(xlToLeft).Column
+    ReDim csvLines(1 To lastRowOrder)
+    For r = 1 To lastRowOrder
+        rowLine = ""
+        For c = 1 To lastCol
+            If c > 1 Then rowLine = rowLine & ","
+            cellVal = wsOrder.Cells(r, c).Text
+            If Len(cellVal) = 0 Then cellVal = CStr(wsOrder.Cells(r, c).Value)
+            rowLine = rowLine & cellVal
+        Next c
+        csvLines(r) = rowLine
+    Next r
+    
     wbOrder.Close False
     wbDaibiki.Close False
+    
+    Dim ff As Integer
+    ff = FreeFile
+    Open orderPath For Output As #ff
+    For r = 1 To UBound(csvLines)
+        Print #ff, csvLines(r)
+    Next r
+    Close #ff
+    
     Application.ScreenUpdating = True
     Application.DisplayAlerts = True
     Exit Sub
