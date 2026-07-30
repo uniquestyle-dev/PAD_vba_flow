@@ -15,16 +15,19 @@ Public Sub DaibikiConvert(filePathIn As String)
     Dim adoStream    As Object
     Dim csvLine      As String
 
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+
     ' ============================================================
     ' 0. 引数チェック
     ' ============================================================
     If filePathIn = "" Then
         MsgBox "ファイルパスが渡されていません。PAD側の変数を確認してください。", vbCritical, "代引き変換エラー"
-        Exit Sub
+        GoTo Cleanup
     End If
     If Dir(filePathIn) = "" Then
         MsgBox "ファイルが見つかりません:" & vbCrLf & filePathIn, vbCritical, "代引き変換エラー"
-        Exit Sub
+        GoTo Cleanup
     End If
 
     filePathOut = "C:\Users\lenovo\Desktop\ダウンロード\代引き.csv"
@@ -73,7 +76,7 @@ Public Sub DaibikiConvert(filePathIn As String)
         .Refresh BackgroundQuery:=False
         On Error Resume Next
             .Delete
-        On Error GoTo 0
+        On Error GoTo ErrHandler
     End With
 
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).row
@@ -83,7 +86,7 @@ Public Sub DaibikiConvert(filePathIn As String)
         MsgBox "データが読み込めませんでした（1行以下）。" & vbCrLf & _
                "ファイル: " & filePathIn, vbCritical, "代引き変換エラー"
         wb.Close SaveChanges:=False
-        Exit Sub
+        GoTo Cleanup
     End If
 
     ' ============================================================
@@ -171,6 +174,9 @@ Public Sub DaibikiConvert(filePathIn As String)
     End With
     
     wb.Close SaveChanges:=False
+Cleanup:
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
     Exit Sub
 
 ' ============================================================
@@ -179,6 +185,8 @@ Public Sub DaibikiConvert(filePathIn As String)
 ErrHandler:
     On Error Resume Next
     If Not wb Is Nothing Then wb.Close SaveChanges:=False
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
     On Error GoTo 0
     MsgBox "予期しないエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
