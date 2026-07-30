@@ -6,12 +6,10 @@ Public Sub DaibikiConvert(filePathIn As String)
     Dim filePathOut  As String
     Dim wb           As Workbook
     Dim ws           As Worksheet
-    Dim qt           As QueryTable
     Dim lastRow      As Long, lastCol As Long
     Dim i As Long, j As Long
     Dim headerLine   As String
     Dim cols         As Variant
-    Dim types()      As Integer
     Dim adoStream    As Object
     Dim csvLine      As String
 
@@ -33,7 +31,7 @@ Public Sub DaibikiConvert(filePathIn As String)
     filePathOut = "C:\Users\lenovo\Desktop\ダウンロード\代引き.csv"
 
     ' ============================================================
-    ' 2. ヘッダー行を読み込んで列データ型を設定
+    ' 2. ヘッダー行を読み込んでテキスト列を特定
     ' ============================================================
     On Error GoTo ErrHandler
     Open filePathIn For Input As #1
@@ -41,45 +39,52 @@ Public Sub DaibikiConvert(filePathIn As String)
     Close #1
 
     cols = Split(headerLine, ",")
-    ReDim types(1 To UBound(cols) + 1)
 
     Dim k As Long
-    For k = LBound(types) To UBound(types)
-        types(k) = xlGeneralFormat
-    Next k
-
     Dim colName As String
+    Dim fi() As Variant
+    Dim fiCount As Long
+    fiCount = 0
+
     For k = LBound(cols) To UBound(cols)
         colName = Replace(cols(k), """", "")
         Select Case colName
             Case "Shipping Street", "Shipping Address1", "Shipping Zip", "Shipping Phone"
-                types(k + 1) = xlTextFormat
+                fiCount = fiCount + 1
         End Select
     Next k
 
-    ' ============================================================
-    ' 3. 新規ワークブック＋QueryTable で UTF-8 インポート
-    ' ============================================================
-    Set wb = Workbooks.Add(xlWBATWorksheet)
+    If fiCount > 0 Then
+        ReDim fi(0 To fiCount - 1)
+        Dim fiIdx As Long
+        fiIdx = 0
+        For k = LBound(cols) To UBound(cols)
+            colName = Replace(cols(k), """", "")
+            Select Case colName
+                Case "Shipping Street", "Shipping Address1", "Shipping Zip", "Shipping Phone"
+                    fi(fiIdx) = Array(k + 1, xlTextFormat)
+                    fiIdx = fiIdx + 1
+            End Select
+        Next k
+
+        Workbooks.OpenText fileName:=filePathIn, _
+            Origin:=65001, _
+            DataType:=xlDelimited, _
+            TextQualifier:=xlDoubleQuote, _
+            Comma:=True, _
+            FieldInfo:=fi
+    Else
+        Workbooks.OpenText fileName:=filePathIn, _
+            Origin:=65001, _
+            DataType:=xlDelimited, _
+            TextQualifier:=xlDoubleQuote, _
+            Comma:=True
+    End If
+
+    Set wb = ActiveWorkbook
     Set ws = wb.Sheets(1)
 
-    Set qt = ws.QueryTables.Add( _
-        Connection:="TEXT;" & filePathIn, _
-        Destination:=ws.Range("A1") _
-    )
-    With qt
-        .TextFileParseType = xlDelimited
-        .TextFilePlatform = 65001
-        .TextFileTextQualifier = xlTextQualifierDoubleQuote
-        .TextFileCommaDelimiter = True
-        .TextFileColumnDataTypes = types
-        .Refresh BackgroundQuery:=False
-        On Error Resume Next
-            .Delete
-        On Error GoTo ErrHandler
-    End With
-
-    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).row
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
     lastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
 
     If lastRow < 2 Then
