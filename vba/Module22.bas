@@ -10,28 +10,26 @@ Public Sub DaibikiConvert(filePathIn As String)
     Dim i As Long, j As Long
     Dim headerLine   As String
     Dim cols         As Variant
+    Dim types()      As Variant
     Dim adoStream    As Object
     Dim csvLine      As String
-
-    Application.ScreenUpdating = False
-    Application.DisplayAlerts = False
 
     ' ============================================================
     ' 0. 引数チェック
     ' ============================================================
     If filePathIn = "" Then
         MsgBox "ファイルパスが渡されていません。PAD側の変数を確認してください。", vbCritical, "代引き変換エラー"
-        GoTo Cleanup
+        Exit Sub
     End If
     If Dir(filePathIn) = "" Then
         MsgBox "ファイルが見つかりません:" & vbCrLf & filePathIn, vbCritical, "代引き変換エラー"
-        GoTo Cleanup
+        Exit Sub
     End If
 
     filePathOut = "C:\Users\lenovo\Desktop\ダウンロード\代引き.csv"
 
     ' ============================================================
-    ' 2. ヘッダー行を読み込んでテキスト列を特定
+    ' 2. ヘッダー行を読み込んで列データ型を設定
     ' ============================================================
     On Error GoTo ErrHandler
     Open filePathIn For Input As #1
@@ -39,59 +37,68 @@ Public Sub DaibikiConvert(filePathIn As String)
     Close #1
 
     cols = Split(headerLine, ",")
+    ReDim types(1 To UBound(cols) + 1)
 
     Dim k As Long
-    Dim colName As String
-    Dim fi() As Variant
-    Dim fiCount As Long
-    fiCount = 0
+    For k = 1 To UBound(cols) + 1
+        types(k) = Array(k, xlGeneralFormat)
+    Next k
 
+    Dim colName As String
     For k = LBound(cols) To UBound(cols)
         colName = Replace(cols(k), """", "")
         Select Case colName
             Case "Shipping Street", "Shipping Address1", "Shipping Zip", "Shipping Phone"
-                fiCount = fiCount + 1
+                types(k + 1) = Array(k + 1, xlTextFormat)
         End Select
     Next k
 
-    If fiCount > 0 Then
-        ReDim fi(0 To fiCount - 1)
-        Dim fiIdx As Long
-        fiIdx = 0
-        For k = LBound(cols) To UBound(cols)
-            colName = Replace(cols(k), """", "")
-            Select Case colName
-                Case "Shipping Street", "Shipping Address1", "Shipping Zip", "Shipping Phone"
-                    fi(fiIdx) = Array(k + 1, xlTextFormat)
-                    fiIdx = fiIdx + 1
-            End Select
-        Next k
+    ' ============================================================
+    ' 3. UTF-8 → Shift_JIS 変換 + OpenText でインポート
+    ' ============================================================
+    Dim tmpPath As String
+    tmpPath = filePathIn & ".sjis.tmp"
+    Dim stmIn As Object, stmOut As Object
+    Set stmIn = CreateObject("ADODB.Stream")
+    stmIn.Type = 2
+    stmIn.Charset = "UTF-8"
+    stmIn.Open
+    stmIn.LoadFromFile filePathIn
+    Dim csvText As String
+    csvText = stmIn.ReadText(-1)
+    stmIn.Close
+    Set stmIn = Nothing
 
-        Workbooks.OpenText fileName:=filePathIn, _
-            Origin:=65001, _
-            DataType:=xlDelimited, _
-            TextQualifier:=xlDoubleQuote, _
-            Comma:=True, _
-            FieldInfo:=fi
-    Else
-        Workbooks.OpenText fileName:=filePathIn, _
-            Origin:=65001, _
-            DataType:=xlDelimited, _
-            TextQualifier:=xlDoubleQuote, _
-            Comma:=True
-    End If
+    Set stmOut = CreateObject("ADODB.Stream")
+    stmOut.Type = 2
+    stmOut.Charset = "Shift_JIS"
+    stmOut.Open
+    stmOut.WriteText csvText, 0
+    stmOut.SaveToFile tmpPath, 2
+    stmOut.Close
+    Set stmOut = Nothing
 
+    Workbooks.OpenText fileName:=tmpPath, _
+        Origin:=932, _
+        DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, _
+        Comma:=True, _
+        FieldInfo:=types
     Set wb = ActiveWorkbook
     Set ws = wb.Sheets(1)
 
-    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    On Error Resume Next
+    Kill tmpPath
+    On Error GoTo ErrHandler
+
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).row
     lastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
 
     If lastRow < 2 Then
         MsgBox "データが読み込めませんでした（1行以下）。" & vbCrLf & _
                "ファイル: " & filePathIn, vbCritical, "代引き変換エラー"
         wb.Close SaveChanges:=False
-        GoTo Cleanup
+        Exit Sub
     End If
 
     ' ============================================================
@@ -177,11 +184,8 @@ Public Sub DaibikiConvert(filePathIn As String)
         .SaveToFile filePathOut, 2      ' 2 = adSaveCreateOverWrite
         .Close
     End With
-    
+
     wb.Close SaveChanges:=False
-Cleanup:
-    Application.ScreenUpdating = True
-    Application.DisplayAlerts = True
     Exit Sub
 
 ' ============================================================
@@ -190,8 +194,6 @@ Cleanup:
 ErrHandler:
     On Error Resume Next
     If Not wb Is Nothing Then wb.Close SaveChanges:=False
-    Application.ScreenUpdating = True
-    Application.DisplayAlerts = True
     On Error GoTo 0
     MsgBox "予期しないエラーが発生しました。" & vbCrLf & _
            "エラー番号: " & Err.Number & vbCrLf & _
