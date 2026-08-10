@@ -954,6 +954,8 @@ LOOP FOREACH CurrentFile IN FileNames
             MouseAndKeyboard.SendMouseClick.Click ClickType: MouseAndKeyboard.MouseClickType.LeftClick MillisecondsDelay: 0
             WAIT 1
             File.ReadFromCSVFile.ReadCSV CSVFile: FilePath Encoding: File.CSVEncoding.SystemDefault TrimFields: True FirstLineContainsColumnNames: False ColumnsSeparator: File.CSVColumnsSeparator.SystemDefault CSVTable=> CSVTable
+            Folder.GetFiles Folder: $'''C:\Users\lenovo\Desktop\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesBefore
+            SET PdfCountBefore TO PdfFilesBefore.Count
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... d0ed2e3fd7\'']['Button'] WaitForPageToLoadTimeout: 60
             WAIT 6
             IF (WebAutomation.IfWebPageContains.WebPageContainsElement BrowserInstance: Browser Control: appmask['Web Page \'h ... lcrumb%3D0\'']['Input password \'password\'']) THEN
@@ -965,9 +967,8 @@ LOOP FOREACH CurrentFile IN FileNames
             END
             SET Elapsed TO 0
             WAIT 10
-            SET WaitSeconds TO CSVTable.RowsCount * 5
             LABEL WaitLoop
-            IF Elapsed >= WaitSeconds THEN
+            IF Elapsed >= 600 THEN
                 GOTO WaitDone
             END
             WebAutomation.GetDetailsOfWebPage BrowserInstance: Browser DetailsType: WebAutomation.DetailsType.Title Details=> WebPageProperty
@@ -998,21 +999,27 @@ LOOP FOREACH CurrentFile IN FileNames
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... hTfg%3D%3D\'']['Button \'次へ\''] WaitForPageToLoadTimeout: 60
                 GOTO WaitLoop
             END
+            Folder.GetFiles Folder: $'''C:\Users\lenovo\Desktop\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesAfter
+            IF PdfFilesAfter.Count > PdfCountBefore THEN
+                GOTO WaitDone
+            END
             WAIT 2
             Variables.IncreaseVariable Value: Elapsed IncrementValue: 2
             GOTO WaitLoop
             LABEL WaitDone
-            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({S})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
             Text.Replace.ReplaceText Text: CurrentFile TextToFind: $'''.csv''' IgnoreCase: False ReplaceWith: $'''.pdf''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> Replaced
             Clipboard.SetText Text: Replaced
-            WAIT 2
-            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({V})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
-            WAIT 1
-            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
-            WAIT 2
-            MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
-            DISABLE WebAutomation.LaunchChrome.AttachToChromeByTitle MatchMode: WebAutomation.MatchMode.Partial TabTitle: $'''.pdf''' AttachTimeout: 5 CommunicationMode: WebAutomation.BrowserCommunicationMethod.Extension TargetDesktop: $'''{\"DisplayName\":\"ローカル コンピューター\",\"Route\":{\"ServerType\":\"Local\",\"ServerAddress\":\"\"},\"DesktopType\":\"local\"}''' BrowserInstance=> Browser3
-            DISABLE WebAutomation.CloseWebBrowser BrowserInstance: Browser3
+            Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> CPlabel
+            File.RenameFiles.Rename Files: CPlabel[0] NewName: Replaced KeepExtension: False IfFileExists: File.IfExists.DoNothing RenamedFiles=> RenamedFiles
+            DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({S})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
+            DISABLE Text.Replace.ReplaceText Text: CurrentFile TextToFind: $'''.csv''' IgnoreCase: False ReplaceWith: $'''.pdf''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> Replaced
+            DISABLE Clipboard.SetText Text: Replaced
+            DISABLE WAIT 2
+            DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A}){Control}({V})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+            DISABLE WAIT 1
+            DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
+            DISABLE WAIT 2
+            DISABLE MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({W})''' DelayBetweenKeystrokes: 50 SendTextAsHardwareKeys: False
             WAIT 1
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... d0ed2e3fd7\'']['Button \'レポート出力\''] WaitForPageToLoadTimeout: 60
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... fd7/report\'']['Button \'CSV出力\''] WaitForPageToLoadTimeout: 60
@@ -1066,7 +1073,7 @@ END
 /# ########　サプリのコンビニ印刷　########
 ########　サプリのコンビニ印刷　########
 ########　サプリのコンビニ印刷　#########/
-System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz02\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0 ProcessId=> AppProcess
+System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz02\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Maximized Timeout: 0 ProcessId=> AppProcess
 WAIT 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 DISABLE UIAutomation.Click.Click Element: appmask['Window \'メイン - [全件データ取得]\'']['Button \'データを取得する\' 2'] ClickType: UIAutomation.ClickType.LeftClick MousePositionRelativeToElement: UIAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
