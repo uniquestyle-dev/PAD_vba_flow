@@ -954,7 +954,7 @@ LOOP FOREACH CurrentFile IN FileNames
             MouseAndKeyboard.SendMouseClick.Click ClickType: MouseAndKeyboard.MouseClickType.LeftClick MillisecondsDelay: 0
             WAIT 1
             File.ReadFromCSVFile.ReadCSV CSVFile: FilePath Encoding: File.CSVEncoding.SystemDefault TrimFields: True FirstLineContainsColumnNames: False ColumnsSeparator: File.CSVColumnsSeparator.SystemDefault CSVTable=> CSVTable
-            Folder.GetFiles Folder: $'''C:\Users\lenovo\Desktop\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesBefore
+            Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesBefore
             SET PdfCountBefore TO PdfFilesBefore.Count
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... d0ed2e3fd7\'']['Button'] WaitForPageToLoadTimeout: 60
             WAIT 6
@@ -967,6 +967,7 @@ LOOP FOREACH CurrentFile IN FileNames
             END
             SET Elapsed TO 0
             WAIT 10
+            DISABLE SET WaitSeconds TO CSVTable.RowsCount * 5
             LABEL WaitLoop
             IF Elapsed >= 600 THEN
                 GOTO WaitDone
@@ -999,7 +1000,7 @@ LOOP FOREACH CurrentFile IN FileNames
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... hTfg%3D%3D\'']['Button \'次へ\''] WaitForPageToLoadTimeout: 60
                 GOTO WaitLoop
             END
-            Folder.GetFiles Folder: $'''C:\Users\lenovo\Desktop\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesAfter
+            Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> PdfFilesAfter
             IF PdfFilesAfter.Count > PdfCountBefore THEN
                 GOTO WaitDone
             END
