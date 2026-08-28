@@ -1071,7 +1071,7 @@ END
 ########　サプリのコンビニ印刷　########
 ########　サプリのコンビニ印刷　#########/
 System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz02\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0 ProcessId=> AppProcess
-WAIT 2
+WAIT 5
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 WAIT 2
 WAIT (UIAutomation.WaitForWindow.ToOpen Window: appmask['Window \'メイン - [全件データ取得]\'']['Window \'NPWizPrint\''] FocusWindow: False)
