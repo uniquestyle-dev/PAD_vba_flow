@@ -1051,14 +1051,14 @@ Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''M:\\BackupAnd
 /# ######　　ラベル印刷　　######
 
 #/
-DISABLE DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-DISABLE Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''yyyyMMdd''' Result=> FormattedDateTime
-DISABLE Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''cmd /c M:\\BackupAndRecovery\\recovery\\SumatraPDF-3.5.2-64\\SumatraPDF-3.5.2-64.exe -print-to \"Canon G6000 series\" -print-settings \"monochrome\" \"C:\\Users\\lenovo\\Desktop\\ダウンロード\\clickpost_merged_salacia_%FormattedDateTime%.pdf\"''' StandardOutput=> CommandOutput3 StandardError=> CommandErrorOutput3 ExitCode=> CommandExitCode3
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''yyyyMMdd''' Result=> FormattedDateTime
+Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''cmd /c M:\\BackupAndRecovery\\recovery\\SumatraPDF-3.5.2-64\\SumatraPDF-3.5.2-64.exe -print-to \"Canon G6000 series\" -print-settings \"monochrome\" \"C:\\Users\\lenovo\\Desktop\\ダウンロード\\clickpost_merged_salacia_%FormattedDateTime%.pdf\"''' StandardOutput=> CommandOutput3 StandardError=> CommandErrorOutput3 ExitCode=> CommandExitCode3
 /# ######　　一覧表印刷　　######
 
 #/
-DISABLE Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''cmd /c M:\\BackupAndRecovery\\recovery\\SumatraPDF-3.5.2-64\\SumatraPDF-3.5.2-64.exe -print-to \"Canon G6000 series\" \"C:\\Users\\lenovo\\Desktop\\ダウンロード\\Salacia_Shipment_List.pdf\"''' StandardOutput=> CommandOutput3 StandardError=> CommandErrorOutput3 ExitCode=> CommandExitCode3
-DISABLE Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【1-4】ラベルと一覧表印刷完了''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【1-4】ラベルと一覧表印刷完了''' Body: $'''【1-4】ラベルと一覧表印刷完了''' IsBodyHtml: False
+Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''cmd /c M:\\BackupAndRecovery\\recovery\\SumatraPDF-3.5.2-64\\SumatraPDF-3.5.2-64.exe -print-to \"Canon G6000 series\" \"C:\\Users\\lenovo\\Desktop\\ダウンロード\\Salacia_Shipment_List.pdf\"''' StandardOutput=> CommandOutput3 StandardError=> CommandErrorOutput3 ExitCode=> CommandExitCode3
+Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【1-4】ラベルと一覧表印刷完了''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【1-4】ラベルと一覧表印刷完了''' Body: $'''【1-4】ラベルと一覧表印刷完了''' IsBodyHtml: False
 /# ########　追跡番号ファイルを結合　########
 #/
 SET OutputPath TO $'''C:\\Users\\lenovo\\Desktop\\ダウンロード\\merged_tracking.csv'''
