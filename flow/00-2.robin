@@ -480,14 +480,12 @@ LOOP FOREACH CurrentFile IN FileNames
             SET PdfCountBefore TO PdfFilesBefore.Count
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... 9b77e7e53d\'']['Button \'A4P4\''] WaitForPageToLoadTimeout: 60
             WAIT 5
+            LABEL WaitLoop
             IF (WebAutomation.IfWebPageContains.WebPageContainsElement BrowserInstance: Browser Control: appmask['Web Page \'h ... lcrumb%3D0\'']['Input password \'password\'']) THEN
                 WebAutomation.PopulateTextField.PopulateTextFieldUsePhysicalKeyboard BrowserInstance: Browser Control: appmask['Web Page \'h ... lcrumb%3D0\'']['Input password \'password\' 2'] Text: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAqxwxJ96i3kKOJwJbeDNkFgQAAAACAAAAAAAQZgAAAAEAACAAAABDJR7gDQYG7sZU2zogmIhz0jkD9bHMyijdhqJkWXmf0gAAAAAOgAAAAAIAACAAAAD7DpzxuUinztBrGWcCspFuFTVcwTCZ2xi/Q1+UmPxyvUAAAAA5cIO0nadESq59wQoV8WGpA660/GrUgCLC7eUXpUH/RGIbU6u7B65oJj1LFjUcIDMJbzwEKmxT5uOiO6exU6GbQAAAANPxPVDW4k7BytPl8JyRJp9sSdO3S3pOTV21QVDpR3AQtOR0hBfkGxGAWPmej5IGeeVOg/axyxQ06FTPcAYcJP4=' Mode: WebAutomation.PopulateTextMode.Replace UnfocusAfterPopulate: True WaitForPageToLoadTimeout: 60
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... lcrumb%3D0\'']['Button \'ログイン\''] WaitForPageToLoadTimeout: 60
+                WAIT 10
             END
-            SET Elapsed TO 0
-            WAIT 10
-            DISABLE SET WaitSeconds TO CSVTable.RowsCount * 5
-            LABEL WaitLoop
             WebAutomation.GetDetailsOfWebPage BrowserInstance: Browser DetailsType: WebAutomation.DetailsType.Title Details=> WebPageProperty
             IF Contains(WebPageProperty, $'''エラー''', False) THEN
                 WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: Browser Url: $'''https://clickpost.jp/mypage/index''' WaitForPageToLoadTimeout: 60
@@ -495,18 +493,6 @@ LOOP FOREACH CurrentFile IN FileNames
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'https://clickpost.jp/mypage/index\'']['Button \'クリックポスト一括登録決済印刷 v4.3.4\''] WaitForPageToLoadTimeout: 60
                 WAIT 1
                 WebAutomation.Click.Click BrowserInstance: Browser Control: appmask['Web Page \'h ... ad/v4/list\'']['Div \'登録\''] ClickType: WebAutomation.ClickType.LeftClick MouseClick: True WaitForPageToLoadTimeout: 60 MousePositionRelativeToElement: WebAutomation.RectangleEdgePoint.MiddleCenter OffsetX: 0 OffsetY: 0
-                DISABLE WebAutomation.ExecuteJavascript BrowserInstance: Browser Javascript: $'''function ExecuteScript() {
-    var cells = document.querySelectorAll(\'div[data-field=\"status\"]\');
-    for (var i = 0; i < cells.length; i++) {
-        if (cells[i].textContent.trim() === \'登録\') {
-            var rect = cells[i].getBoundingClientRect();
-            var x = Math.round(window.screenX + (window.outerWidth - window.innerWidth) / 2 + rect.left + rect.width / 2);
-            var y = Math.round(window.screenY + (window.outerHeight - window.innerHeight) + rect.top + rect.height / 2);
-            return x + \',\' + y;
-        }
-    }
-    return \'not found\';
-}''' Result=> Result
                 WAIT 3
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... d0ed2e3fd7\'']['Button'] WaitForPageToLoadTimeout: 60
                 WAIT 6
@@ -526,7 +512,6 @@ LOOP FOREACH CurrentFile IN FileNames
                 GOTO WaitDone
             END
             WAIT 2
-            Variables.IncreaseVariable Value: Elapsed IncrementValue: 2
             GOTO WaitLoop
             LABEL WaitDone
             Text.Replace.ReplaceText Text: CurrentFile TextToFind: $'''.csv''' IgnoreCase: False ReplaceWith: $'''.pdf''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> Replaced
