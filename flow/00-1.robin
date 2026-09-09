@@ -967,8 +967,11 @@ LOOP FOREACH CurrentFile IN FileNames
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... lcrumb%3D0\'']['Button \'ログイン\''] WaitForPageToLoadTimeout: 60
                 GOTO CvvInput
             END
-            WebAutomation.GetDetailsOfWebPage BrowserInstance: Browser DetailsType: WebAutomation.DetailsType.Title Details=> WebPageProperty
-            IF Contains(WebPageProperty, $'''エラー99999''', False) THEN
+            WebAutomation.ExecuteJavascript BrowserInstance: Browser Javascript: $'''function ExecuteScript() {
+    var t = document.body.innerText;
+    return t.indexOf(\'確定に失敗\') >= 0 ? \'PAYERROR\' : \'OK\';
+}''' Result=> PayCheck
+            IF PayCheck = $'''PAYERROR''' THEN
                 WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: Browser Url: $'''https://clickpost.jp/mypage/index''' WaitForPageToLoadTimeout: 60
                 WAIT 2
                 WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'https://clickpost.jp/mypage/index\'']['Button \'クリックポスト一括登録決済印刷 v4.3.4\''] WaitForPageToLoadTimeout: 60
