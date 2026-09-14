@@ -1057,7 +1057,7 @@ END
 /# ########　サプリのコンビニ印刷　########
 ########　サプリのコンビニ印刷　########
 ########　サプリのコンビニ印刷　#########/
-LABEL NpStart
+DISABLE LABEL NpStart
 System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz02\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Maximized Timeout: 0 ProcessId=> AppProcess
 WAIT 5
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
@@ -1065,18 +1065,18 @@ WAIT 2
 WAIT (UIAutomation.WaitForWindow.ToOpen Window: appmask['Window \'メイン - [全件データ取得]\'']['Window \'NPWizPrint\''] FocusWindow: False)
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 WAIT 2
-UIAutomation.GetWindow.GetUseTimeout Control: appmask['Window \'メイン - [全件データ取得]\'']['Window \'NPWizPrint\' 3'] BringWindowToFront: True Timeout: 5 WindowInstance=> AutomationWindow
+DISABLE UIAutomation.GetWindow.GetUseTimeout Control: appmask['Window \'メイン - [全件データ取得]\'']['Window \'NPWizPrint\' 3'] BringWindowToFront: True Timeout: 5 WindowInstance=> AutomationWindow
 ON ERROR
     GOTO NpReopen
 END
-GOTO NpReady
-LABEL NpReopen
+DISABLE GOTO NpReady
+DISABLE LABEL NpReopen
 UIAutomation.CloseWindow.Close Window: appmask['Window \'メイン - [検索印刷]\'']
 WAIT 2
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Y}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 WAIT 5
-GOTO NpStart
-LABEL NpReady
+DISABLE GOTO NpStart
+DISABLE LABEL NpReady
 IF (UIAutomation.IfWindowContains.WindowContainsText Text: $'''0/0件''' Window: appmask['Window \'メイン - [全件データ取得]\'']['Text \'進行状況：0/0件\' 4']) THEN
     UIAutomation.CloseWindow.Close Window: appmask['Window \'メイン - [全件データ取得]\'']
     WAIT 2
