@@ -461,15 +461,22 @@ LOOP FOREACH CurrentFile IN FileNames
         WebAutomation.Focus.Focus BrowserInstance: Browser Control: appmask['Web Page \'h ... eate/excel\'']['Text area \'<textarea  ...  height: 240px;\">\' 2'] WaitForPageToLoadTimeout: 60
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({V})''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+        Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''yyyy-MM-dd HH:mm''' Result=> RegStartTime
+        File.ReadFromCSVFile.ReadCSV CSVFile: FilePath Encoding: File.CSVEncoding.SystemDefault TrimFields: True FirstLineContainsColumnNames: False ColumnsSeparator: File.CSVColumnsSeparator.SystemDefault CSVTable=> CountTable
+        SET LabelCount TO CountTable.RowsCount - 1
         Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''yyyyMMdd_HHmmss''' Result=> FormattedDateTimeSec
         WAIT 2
         Workstation.TakeScreenshot.TakeScreenshotAndSaveToFile File: $'''C:\\Users\\lenovo\\Desktop\\Screenshots\\clickpost_register_book%FormattedDateTimeSec%.png''' ImageFormat: System.ImageFormat.Png
         WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'h ... eate/excel\'']['Button \'登録\' 3'] WaitForPageToLoadTimeout: 60
         WebAutomation.ExecuteJavascript BrowserInstance: Browser Javascript: $'''function ExecuteScript() {
-    var cells = document.querySelectorAll(\'div[data-field=\"status\"]\');
-    for (var i = 0; i < cells.length; i++) {
-        if (cells[i].textContent.trim() === \'未処理\') {
-            var rect = cells[i].getBoundingClientRect();
+    var rows = document.querySelectorAll(\'div[role=\"row\"][data-id]\');
+    for (var i = 0; i < rows.length; i++) {
+        var st = rows[i].querySelector(\'div[data-field=\"status\"]\');
+        var rc = rows[i].querySelector(\'div[data-field=\"records\"]\');
+        var ct = rows[i].querySelector(\'div[data-field=\"create_time\"]\');
+        if (!st || !rc || !ct) { continue; }
+        if (st.textContent.trim() === \'未処理\' && parseInt(rc.textContent.trim(), 10) === %LabelCount% && ct.textContent.trim() >= \'%RegStartTime%\') {
+            var rect = st.getBoundingClientRect();
             var x = Math.round(window.screenX + (window.outerWidth - window.innerWidth) / 2 + rect.left + rect.width / 2);
             var y = Math.round(window.screenY + (window.outerHeight - window.innerHeight) + rect.top + rect.height / 2);
             return x + \',\' + y;
@@ -526,6 +533,10 @@ LOOP FOREACH CurrentFile IN FileNames
             LABEL WaitDone
             Text.Replace.ReplaceText Text: CurrentFile TextToFind: $'''.csv''' IgnoreCase: False ReplaceWith: $'''.pdf''' ActivateEscapeSequences: False ComparisonType: Text.TextComparisonType.CultureSensitive Result=> Replaced
             Clipboard.SetText Text: Replaced
+            IF (File.IfFile.Exists File: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード\\%Replaced%''') THEN
+                Email.SendEmail.AuthenticateAndSend SMTPServer: $'''whitelynx5.sakura.ne.jp''' Port: 587 EnableSSL: True Username: $'''shop@localab.net''' Password: P'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAi45C+A8fSkORzBO9P8shAgQAAAACAAAAAAAQZgAAAAEAACAAAADJVpsCa9Mz192ZMvOeUd65CcFnLK3Eevm2TW9vYQTCKQAAAAAOgAAAAAIAACAAAABLG+eqG4yUK2blijSH92Gp0rorN9GPsst8yhT0zRjNPCAAAACJDpFdkADXQJz65A70pAWOYDvP+jiv3iEhWlnLUcfWikAAAADaqkjLfQVvZ59CWv/opLujcfyVYqMBvogMfnQLEB4/PpcMKDVHvr1nvV08bjbPZny1DItBi3HEd/sKANW/f4lI' AcceptUntrustedCertificates: False SendFrom: $'''shop@localab.net''' SenderDisplayName: $'''【停止】%Replaced% が既に存在''' SendTo: $'''yonemori2@gmail.com''' Subject: $'''【停止】%Replaced% が既に存在''' Body: $'''クリックポストのラベルPDFを %Replaced% にリネームできないため、フローを停止しました。ダウンロードフォルダを確認してください。''' IsBodyHtml: False
+                EXIT Code: 0 ErrorMessage: $'''%Replaced% が既に存在するため停止しました'''
+            END
             Folder.GetFiles Folder: $'''C:\\Users\\lenovo\\Desktop\\ダウンロード''' FileFilter: $'''*.pdf''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.CreationTime SortDescending1: True SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> CPlabel
             File.RenameFiles.Rename Files: CPlabel[0] NewName: Replaced KeepExtension: False IfFileExists: File.IfExists.DoNothing RenamedFiles=> RenamedFiles
             WAIT 1
@@ -578,10 +589,14 @@ Set objExcel = Nothing''' ScriptOutput=> VBScriptOutput
             WebAutomation.PressButton.PressButton BrowserInstance: Browser Control: appmask['Web Page \'https://clickpost.jp/mypage/index\'']['Button \'クリックポスト一括登録決済印刷 v4.3.4\''] WaitForPageToLoadTimeout: 60
             WAIT 2
             WebAutomation.ExecuteJavascript BrowserInstance: Browser Javascript: $'''function ExecuteScript() {
-    var cells = document.querySelectorAll(\'div[data-field=\"status\"]\');
-    for (var i = 0; i < cells.length; i++) {
-        if (cells[i].textContent.trim() === \'未処理\') {
-            var rect = cells[i].getBoundingClientRect();
+    var rows = document.querySelectorAll(\'div[role=\"row\"][data-id]\');
+    for (var i = 0; i < rows.length; i++) {
+        var st = rows[i].querySelector(\'div[data-field=\"status\"]\');
+        var rc = rows[i].querySelector(\'div[data-field=\"records\"]\');
+        var ct = rows[i].querySelector(\'div[data-field=\"create_time\"]\');
+        if (!st || !rc || !ct) { continue; }
+        if (st.textContent.trim() === \'未処理\' && parseInt(rc.textContent.trim(), 10) === %LabelCount% && ct.textContent.trim() >= \'%RegStartTime%\') {
+            var rect = st.getBoundingClientRect();
             var x = Math.round(window.screenX + (window.outerWidth - window.innerWidth) / 2 + rect.left + rect.width / 2);
             var y = Math.round(window.screenY + (window.outerHeight - window.innerHeight) + rect.top + rect.height / 2);
             return x + \',\' + y;
