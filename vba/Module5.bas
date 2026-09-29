@@ -1,7 +1,7 @@
 Attribute VB_Name = "Module5"
 Option Explicit
 
-Public Sub STORESï¿½ÏŠï¿½()
+Public Sub STORES•ÏŠ·()
     Dim inputFile As String
     Dim outputFolder As String
     Dim wbInput As Workbook
@@ -21,14 +21,14 @@ Public Sub STORESï¿½ÏŠï¿½()
     Dim lineParts As Variant
     Dim i As Long
 
-    ' ï¿½ï¿½ï¿½ï¿½CSVï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½
-    inputFile = Application.GetOpenFilename("CSV Files (*.csv),*.csv", , "ï¿½ï¿½ï¿½ï¿½CSVï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½")
+    ' “ü—ÍCSVƒtƒ@ƒCƒ‹‚ğ‘I‘ğ
+    inputFile = Application.GetOpenFilename("CSV Files (*.csv),*.csv", , "“ü—ÍCSVƒtƒ@ƒCƒ‹‚ğ‘I‘ğ")
     If inputFile = "False" Then Exit Sub
 
-    ' ï¿½oï¿½Íï¿½tï¿½Hï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½fï¿½Xï¿½Nï¿½gï¿½bï¿½vï¿½ÉŒÅ’ï¿½
+    ' o—ÍæƒtƒHƒ‹ƒ_‚ğƒfƒXƒNƒgƒbƒv‚ÉŒÅ’è
     outputFolder = CreateObject("WScript.Shell").SpecialFolders("Desktop")
 
-    ' CSVï¿½ï¿½Shift-JISï¿½Å“Ç‚İï¿½ï¿½ï¿½
+    ' CSV‚ğShift-JIS‚Å“Ç‚İ‚Ş
     Workbooks.OpenText _
         fileName:=inputFile, _
         Origin:=932, _
@@ -39,55 +39,55 @@ Public Sub STORESï¿½ÏŠï¿½()
     Set wbInput = ActiveWorkbook
     Set ws = wbInput.Sheets(1)
 
-    ' ï¿½wï¿½bï¿½_ï¿½s
+    ' ƒwƒbƒ_s
     Set headerRow = ws.Rows(1)
-    colItem = Application.Match("ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½", headerRow, 0)
-    colZip = Application.Match("ï¿½Xï¿½Ö”Ôï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", headerRow, 0)
-    colSei = Application.Match("ï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", headerRow, 0)
-    colMei = Application.Match("ï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", headerRow, 0)
-    colPref = Application.Match("ï¿½sï¿½ï¿½ï¿½{ï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", headerRow, 0)
-    colAddr = Application.Match("ï¿½Zï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", headerRow, 0)
-    colOrderNumber = Application.Match("ï¿½Iï¿½[ï¿½_ï¿½[ï¿½Ôï¿½", headerRow, 0)
-    colOrderDate = Application.Match("ï¿½Iï¿½[ï¿½_ï¿½[ï¿½ï¿½", headerRow, 0)
+    colItem = Application.Match("ƒAƒCƒeƒ€–¼", headerRow, 0)
+    colZip = Application.Match("—X•Ö”Ô†(”z‘—æ)", headerRow, 0)
+    colSei = Application.Match("(”z‘—æ)", headerRow, 0)
+    colMei = Application.Match("–¼(”z‘—æ)", headerRow, 0)
+    colPref = Application.Match("“s“¹•{Œ§(”z‘—æ)", headerRow, 0)
+    colAddr = Application.Match("ZŠ(”z‘—æ)", headerRow, 0)
+    colOrderNumber = Application.Match("ƒI[ƒ_[”Ô†", headerRow, 0)
+    colOrderDate = Application.Match("ƒI[ƒ_[“ú", headerRow, 0)
 
-    ' ï¿½fï¿½[ï¿½^ï¿½ÅIï¿½s
+    ' ƒf[ƒ^ÅIs
     lastRow = ws.Cells(ws.Rows.Count, colItem).End(xlUp).row
 
     If lastRow <= 1 Then
         wbInput.Close SaveChanges:=False
-        Debug.Print "STORES ï¿½ï¿½Mï¿½fï¿½[ï¿½^0ï¿½ï¿½ - ï¿½Xï¿½Lï¿½bï¿½v"
+        Debug.Print "STORES óMƒf[ƒ^0Œ - ƒXƒLƒbƒv"
         Exit Sub
     End If
 
-    ' FileSystemObject ï¿½ï¿½ï¿½ï¿½
+    ' FileSystemObject €”õ
     Set fso = CreateObject("Scripting.FileSystemObject")
 
-    'ï¿½ï¿½ï¿½ï¿½ 1.csvï¿½iï¿½Tï¿½}ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½oï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    '„Ÿ„Ÿ 1.csviƒTƒ}ƒŠj‚ğo—Í „Ÿ„Ÿ
     Set tsSummary = fso.CreateTextFile(outputFolder & "\1.csv", True, False)
-    ' ï¿½wï¿½bï¿½_ï¿½sï¿½iï¿½Jï¿½ï¿½ï¿½}ï¿½ï¿½Ø‚ï¿½j
+    ' ƒwƒbƒ_siƒJƒ“ƒ}‹æØ‚èj
     tsSummary.WriteLine Join(Array( _
-        "ï¿½Iï¿½[ï¿½_ï¿½[ï¿½Ôï¿½", "ï¿½Iï¿½[ï¿½_ï¿½[ï¿½ï¿½", _
-        "ï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", "ï¿½ï¿½(ï¿½zï¿½ï¿½ï¿½ï¿½)", _
-        "ï¿½zï¿½ï¿½ï¿½ï¿½ï¿½@", "ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½", "ï¿½â‚¢ï¿½ï¿½ï¿½í‚¹ï¿½Ôï¿½", "ï¿½ï¿½ï¿½l", _
-        "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" _
+        "ƒI[ƒ_[”Ô†", "ƒI[ƒ_[“ú", _
+        "(”z‘—æ)", "–¼(”z‘—æ)", _
+        "”z‘—•û–@", "“’…—\’è“ú", "–â‚¢‡‚í‚¹”Ô†", "”õl", _
+        "”­‘—Š®—¹" _
     ), ",")
-    ' ï¿½fï¿½[ï¿½^ï¿½sï¿½iï¿½Jï¿½ï¿½ï¿½}ï¿½ï¿½Ø‚ï¿½j
+    ' ƒf[ƒ^siƒJƒ“ƒ}‹æØ‚èj
     For i = 2 To lastRow
         tsSummary.WriteLine _
             ws.Cells(i, colOrderNumber).Value & "," & _
             Format(ws.Cells(i, colOrderDate).Value, "yyyy/m/d h:mm") & "," & _
             ws.Cells(i, colSei).Value & "," & _
             ws.Cells(i, colMei).Value & "," & _
-            "ï¿½ï¿½ï¿½{ï¿½Xï¿½ï¿½" & "," & _
+            "“ú–{—X•Ö" & "," & _
             "" & "," & _
             "" & "," & _
             "" & "," & _
             "1"
     Next i
     tsSummary.Close
-    'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    '„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ„Ÿ
 
-    ' ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½ï¿½Åƒ\ï¿½[ï¿½gï¿½iï¿½Cï¿½Ój
+    ' ƒAƒCƒeƒ€–¼‚Åƒ\[ƒgi”CˆÓj
     ws.Sort.SortFields.Clear
     ws.Sort.SortFields.Add key:=ws.Range(ws.Cells(2, colItem), ws.Cells(lastRow, colItem)), _
         SortOn:=xlSortOnValues, Order:=xlAscending
@@ -97,35 +97,35 @@ Public Sub STORESï¿½ÏŠï¿½()
         .Apply
     End With
 
-    ' ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½Bï¿½Nï¿½Vï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½
+    ' ƒAƒCƒeƒ€–¼‚ğƒfƒBƒNƒVƒ‡ƒiƒŠ‚É
     Set dict = CreateObject("Scripting.Dictionary")
     For Each cell In ws.Range(ws.Cells(2, colItem), ws.Cells(lastRow, colItem))
         If Not dict.Exists(cell.Value) Then dict.Add cell.Value, Empty
     Next cell
 
-    ' ï¿½oï¿½Í—pï¿½wï¿½bï¿½_ï¿½zï¿½ï¿½
+    ' o—Í—pƒwƒbƒ_”z—ñ
     fields = Array( _
-        "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Xï¿½Ö”Ôï¿½", "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½æï¿½ï¿½", "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½hï¿½ï¿½", _
-        "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Zï¿½ï¿½1ï¿½sï¿½ï¿½", "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Zï¿½ï¿½2ï¿½sï¿½ï¿½", _
-        "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Zï¿½ï¿½3ï¿½sï¿½ï¿½", "ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Zï¿½ï¿½4ï¿½sï¿½ï¿½", "ï¿½ï¿½ï¿½eï¿½i" _
+        "‚¨“Í‚¯æ—X•Ö”Ô†", "‚¨“Í‚¯æ–¼", "‚¨“Í‚¯æŒhÌ", _
+        "‚¨“Í‚¯æZŠ1s–Ú", "‚¨“Í‚¯æZŠ2s–Ú", _
+        "‚¨“Í‚¯æZŠ3s–Ú", "‚¨“Í‚¯æZŠ4s–Ú", "“à—e•i" _
     )
 
     idx = 1
-    ' ï¿½eï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½ï¿½Æ‚Éƒeï¿½Lï¿½Xï¿½gï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ğ¶ï¿½
+    ' ŠeƒAƒCƒeƒ€‚²‚Æ‚ÉƒeƒLƒXƒgƒtƒ@ƒCƒ‹‚ğ¶¬
     For Each item In dict.Keys
         Set ts = fso.CreateTextFile(outputFolder & "\Book" & idx & ".csv", True, False)
-        ' ï¿½wï¿½bï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        ' ƒwƒbƒ_‘‚«‚İ
         ts.WriteLine Join(fields, vbTab)
-        ' ï¿½fï¿½[ï¿½^ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        ' ƒf[ƒ^s‘‚«‚İ
         For Each cell In ws.Range(ws.Cells(2, colItem), ws.Cells(lastRow, colItem))
             If cell.Value = item Then
                 lineParts = Array( _
                     ws.Cells(cell.row, colZip).Value, _
                     ws.Cells(cell.row, colSei).Value & ws.Cells(cell.row, colMei).Value, _
-                    "ï¿½l", _
+                    "—l", _
                     ws.Cells(cell.row, colPref).Value, _
                     ws.Cells(cell.row, colAddr).Value, _
-                    "", "", "ï¿½ï¿½ï¿½ï¿½" _
+                    "", "", "‘Ğ" _
                 )
                 ts.WriteLine Join(lineParts, vbTab)
             End If
@@ -136,7 +136,7 @@ Public Sub STORESï¿½ÏŠï¿½()
 
     wbInput.Close SaveChanges:=False
    
-    ' 1.csv ï¿½ï¿½ï¿½Jï¿½ï¿½
+    ' 1.csv ‚ğŠJ‚­
     Workbooks.Open fileName:=outputFolder & "\1.csv"
 End Sub
 
