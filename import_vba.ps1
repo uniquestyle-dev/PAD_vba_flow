@@ -49,6 +49,21 @@ if (Get-Process -Name EXCEL -ErrorAction SilentlyContinue) {
     throw "Excelが起動中です。完全に閉じてから再実行してください。"
 }
 
+# ---- 符号化チェック: .bas/.cls/.frm は CP932 必須。UTF-8化したファイルがあれば中断 ----
+#   CP932の日本語は厳密なUTF-8としてはまず解釈できないため、
+#   「非ASCIIを含み、かつUTF-8として正しく読める」ものをUTF-8保存とみなす。
+$strictUtf8 = New-Object System.Text.UTF8Encoding($false, $true)
+$badFiles = @()
+foreach ($f in (Get-ChildItem -Path $VbaDir -File | Where-Object { $_.Extension -in ".bas", ".cls", ".frm" })) {
+    $bytes = [System.IO.File]::ReadAllBytes($f.FullName)
+    if (-not ($bytes | Where-Object { $_ -ge 0x80 } | Select-Object -First 1)) { continue }  # ASCIIのみはOK
+    try   { $null = $strictUtf8.GetString($bytes); $badFiles += $f.Name }
+    catch { }  # UTF-8として不正 = CP932 とみなしOK
+}
+if ($badFiles.Count -gt 0) {
+    throw ("UTF-8で保存された .bas 等があります（CP932必須）。インポートを中止しました: " + ($badFiles -join ", "))
+}
+
 # ---- Excel 起動（イベント抑止でWorkbook_Open等を走らせない）----
 $excel = New-Object -ComObject Excel.Application
 $excel.Visible = $false
