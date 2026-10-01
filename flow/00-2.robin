@@ -674,7 +674,7 @@ Scripting.RunDOSCommand.RunDOSCommand DOSCommandOrApplication: $'''taskkill /f /
 /# ########　ShopifyNP振込用紙印刷　########
 ########　ShopifyNP振込用紙印刷　########
 ########　ShopifyNP振込用紙印刷　#########/
-System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz01\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Maximized Timeout: 0 ProcessId=> AppProcess
+System.RunApplication.RunApplicationAndWaitToLoad ApplicationPath: $'''C:\\NPWizPrintV2_10\\wiz01\\NPWizPrint.exe''' WindowStyle: System.ProcessWindowStyle.Normal Timeout: 0 ProcessId=> AppProcess
 WAIT 5
 MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Enter}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 WAIT 5
